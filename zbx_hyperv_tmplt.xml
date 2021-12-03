@@ -12,7 +12,8 @@
             <template>Template Hyper-V</template>
             <name>Template Hyper-V</name>
             <description>Basic monitoring of Hyper-V feature. Best works in cooperation with Windows OS monitoring. &#13;
-Template provides monitoring of state of VMs, checkpoint presence and replication status</description>
+                           Template provides monitoring of state of VMs, checkpoint presence and replication status
+            </description>
             <groups>
                 <group>
                     <name>Templates/Virtualization</name>
@@ -29,8 +30,9 @@ Template provides monitoring of state of VMs, checkpoint presence and replicatio
                     <key>hyperv[HyperVstatus]</key>
                     <delay>12h</delay>
                     <description>status of hyper-v feature&#13;
-0 - disabled&#13;
-1 - enabled</description>
+                                 0 - disabled&#13;
+                                 1 - enabled
+                    </description>
                     <applications>
                         <application>
                             <name>Hyper-V</name>
@@ -84,8 +86,9 @@ Template provides monitoring of state of VMs, checkpoint presence and replicatio
                             <key>hyperv[VMcheckpoint,{#VMNAME}]</key>
                             <delay>12h</delay>
                             <description>Checkpoint status for VM&#13;
-0 - no checkpoint exist&#13;
-1 - at least 1 checkpoint exist</description>
+                                            0 - no checkpoint exist&#13;
+                                            1 - at least 1 checkpoint exist
+                            </description>
                             <applications>
                                 <application>
                                     <name>Hyper-V</name>
@@ -106,11 +109,12 @@ Template provides monitoring of state of VMs, checkpoint presence and replicatio
                             <key>hyperv[VMreplica,{#VMNAME}]</key>
                             <delay>12h</delay>
                             <description>Status of VM replication process&#13;
-0 - disabled&#13;
-1 - normal&#13;
-2 - warning&#13;
-3 - error&#13;
-4 - unknown</description>
+                                            0 - disabled&#13;
+                                            1 - normal&#13;
+                                            2 - warning&#13;
+                                            3 - error&#13;
+                                            4 - unknown
+                            </description>
                             <applications>
                                 <application>
                                     <name>Hyper-V</name>
@@ -138,8 +142,9 @@ Template provides monitoring of state of VMs, checkpoint presence and replicatio
                             <key>hyperv[VMstatus,{#VMNAME}]</key>
                             <delay>8h</delay>
                             <description>0 - VM status is not optimal&#13;
-1 - VM status is OK&#13;
-2 - VM is running backup</description>
+                                            1 - VM status is OK&#13;
+                                            2 - VM is running backup
+                            </description>
                             <applications>
                                 <application>
                                     <name>Hyper-V</name>
