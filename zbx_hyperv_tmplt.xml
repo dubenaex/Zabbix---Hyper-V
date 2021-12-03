@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-12-03T07:34:57Z</date>
+    <groups>
+        <group>
+            <name>Templates/Virtualization</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template Hyper-V</template>
+            <name>Template Hyper-V</name>
+            <description>Basic monitoring of Hyper-V feature. Best works in cooperation with Windows OS monitoring. &#13;
+Template provides monitoring of state of VMs, checkpoint presence and replication status</description>
+            <groups>
+                <group>
+                    <name>Templates/Virtualization</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Hyper-V</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Status of Hyper-V feature</name>
+                    <key>hyperv[HyperVstatus]</key>
+                    <delay>12h</delay>
+                    <description>status of hyper-v feature&#13;
+0 - disabled&#13;
+1 - enabled</description>
+                    <applications>
+                        <application>
+                            <name>Hyper-V</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last(#2)}&lt;&gt;1</expression>
+                            <name>Status of Hyper-V for {HOST.NAME} is disabled</name>
+                            <priority>HIGH</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>VM count</name>
+                    <key>hyperv[VMcount]</key>
+                    <delay>24h</delay>
+                    <description>Number of VMs running in Hypervisor (VMs which are off are included)</description>
+                    <applications>
+                        <application>
+                            <name>Hyper-V</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last(#2)}=0 or {nodata(50h)}=1</expression>
+                            <name>No VM info received from Hypervisor {HOST.NAME}</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>Status of Hyper-V for {HOST.NAME} is disabled</name>
+                                    <expression>{Template Hyper-V:hyperv[HyperVstatus].last(#2)}&lt;&gt;1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Hyper-V VMs</name>
+                    <key>hyperv[&quot;DiscoveryVMs&quot;]</key>
+                    <delay>8h</delay>
+                    <lifetime>2d</lifetime>
+                    <description>discovers all VMs on Hyper-V (VMs which are Off are excluded)</description>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Checkpoint status of {#VMNAME}</name>
+                            <key>hyperv[VMcheckpoint,{#VMNAME}]</key>
+                            <delay>12h</delay>
+                            <description>Checkpoint status for VM&#13;
+0 - no checkpoint exist&#13;
+1 - at least 1 checkpoint exist</description>
+                            <applications>
+                                <application>
+                                    <name>Hyper-V</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{min(3d)}&gt;0</expression>
+                                    <name>VM {#VMNAME} is running from checkpoint for more than a 3 days</name>
+                                    <priority>WARNING</priority>
+                                    <description>VM is running from checkpoint for more than a 3 days</description>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Replication status of {#VMNAME}</name>
+                            <key>hyperv[VMreplica,{#VMNAME}]</key>
+                            <delay>12h</delay>
+                            <description>Status of VM replication process&#13;
+0 - disabled&#13;
+1 - normal&#13;
+2 - warning&#13;
+3 - error&#13;
+4 - unknown</description>
+                            <applications>
+                                <application>
+                                    <name>Hyper-V</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(#4)}=2</expression>
+                                    <name>Replication for VM {#VMNAME} is in warning state</name>
+                                    <priority>WARNING</priority>
+                                    <description>Replication for VM is returning 2 (warning)</description>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{min(2)}&gt;=3</expression>
+                                    <name>Replication for VM {#VMNAME} is not working</name>
+                                    <priority>AVERAGE</priority>
+                                    <description>Replication status for VM is returning 3 (error) or 4 (unknown)</description>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Health status of {#VMNAME}</name>
+                            <key>hyperv[VMstatus,{#VMNAME}]</key>
+                            <delay>8h</delay>
+                            <description>0 - VM status is not optimal&#13;
+1 - VM status is OK&#13;
+2 - VM is running backup</description>
+                            <applications>
+                                <application>
+                                    <name>Hyper-V</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{max(#2)}=0</expression>
+                                    <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                                    <recovery_expression>{last()}&gt;0</recovery_expression>
+                                    <name>VM {#VMNAME} health state is not optimal</name>
+                                    <priority>HIGH</priority>
+                                    <description>Health for VM is returning 0 (non optimal)</description>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+        </template>
+    </templates>
+</zabbix_export>
